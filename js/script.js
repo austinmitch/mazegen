@@ -2,7 +2,7 @@
 
 var cols, rows;
 var w = 10;
-var grid = [];
+var grid;
 
 var current;
 
@@ -14,26 +14,30 @@ function setup() {
   cols = floor(width/w);
   rows = floor(height/w);
 
+  grid = new Array(cols);
+
+  for(i = 0; i < cols; i++) {
+    grid[i] = new Array(rows);
+  }
   for(var j = 0; j < rows; j++) {
     for(var i = 0; i < cols; i++) {
-      var cell = new Cell(i,j);
-      grid.push(cell);
+      grid[i][j] = new Cell(i,j);
     }
   }
 
-  current = grid[0];
+  current = grid[0][0];
 }
 
 function draw() {
   background(51);
-  for(var i = 0; i < grid.length; i++) {
-    grid[i].show();
+  for(var i = 0; i < cols; i++) {
+    for(var j = 0; j < rows; j++) {
+      grid[i][j].show();
+    }
   }
-
-  current.visited = true;
-  // current.highlight();
-  current.checkNeighbors();
-  var next = current.checkNeighbors();
+  current.visited = true
+  current.checkNeighbors(grid);
+  var next = current.checkNeighbors(grid);
   if(next) {
     next.visited = true;
 
@@ -52,24 +56,20 @@ function draw() {
 
 }
 
-function index(i,j) {
-  if(i < 0 || j < 0 || i > cols-1 || j > rows-1) {
-    return -1;
-  }
-  return i + j * cols;
-}
-
 function Cell(i, j) {
   this.i = i; // col
   this.j = j; // row
   this.walls = [true, true, true, true];
   this.visited = false;
-  this.checkNeighbors = function() {
+  this.checkNeighbors = function(grid) {
+    var i = this.i;
+    var j = this.j;
     var neighbors = [];
-    var top = grid[index(i,j-1)];
-    var right = grid[index(i+1,j)];
-    var bottom = grid[index(i,j+1)];
-    var left = grid[index(i-1,j)];
+
+    if(j > 0) { var top = grid[i][j-1]; }
+    if(i < cols-1) { var right = grid[i+1][j]; }
+    if(j < rows-1) { var bottom = grid[i][j+1]; }
+    if(i > 0) { var left = grid[i-1][j]; }
 
     if(top && !top.visited) {
       neighbors.push(top);
