@@ -1,7 +1,25 @@
 //https://en.wikipedia.org/wiki/Maze_generation_algorithm#Recursive_backtracker
 
+/**
+* PSEUDO CODE
+
+ * Adding A* algorithm to mazegen
+ * Walls are no longer entire block
+ * need to analyze "next" space and check it walls
+
+ * if(next == [i+1][j])
+   * if(next.walls[1] == true)
+    * Cant proceed
+
+ * repeat above code for top bottom left and right walls
+*/
+
+
+
+
+
 var cols, rows;
-var w = 10;
+var w = 40;
 var grid;
 
 var current;
@@ -51,7 +69,7 @@ function draw() {
   }
   if(stack.length === 0) {
     noLoop();
-    saveCanvas('maze','jpg');
+    // saveCanvas('maze','jpg');
   }
 
 }
