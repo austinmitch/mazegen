@@ -88,6 +88,7 @@ function draw() {
   }
   if(stack.length === 0) {
     noLoop();
+    astar(grid);
     // saveCanvas('maze','jpg');
   }
 }
@@ -95,43 +96,97 @@ function draw() {
 /**
  * Function to solve maze.
 */
-function astar(grid) {
+function astar(astarGrid) {
+  start = astarGrid[0][0];
+  end = astarGrid[cols - 1][rows - 1];
 
-  start = grid[0][0];
-  end = grid[cols - 1][rows - 1];
-
+  openSet.push(start);
   for (var i = 0; i < cols; i++) {
     for (var j = 0; j < rows; j++) {
-      grid[i][j].addNeighbors(grid);
+      astarGrid[i][j].addNeighbors(astarGrid);
     }
   }
 
-  while (openSet.length > 0) {
-    var winner = 0;
-    for (var i = 0; i < openSet.length; i++) {
-      if(openSet[i].f < openSet[winner].f) {
+  var winner = 0;
+  while (openSet.length >= 0) {
+    console.log('checking');
+        for (var i = 0; i < openSet.length; i++) {
+          if(openSet[i].f < openSet[winner].f) {
         winner = i;
       }
     }
     var astarCurrent = openSet[winner];
-    if(current == end) {
-      console.log('done');
-      console.log(path);
+
+
+    // var temp = astarCurrent;
+    // path.push(temp)
+    // while(temp.previous) {
+    //   path.push(temp.previous);
+    //   temp = temp.previous;
+    // }
+
+    for(var i = 0; i < path.length; i++) {
+      path[i].show(color(255,0,0));
     }
 
-    removeFromArray(openSet, current);
-    closedSet.push(current);
+    if(astarCurrent == end) {
+      console.log('done');
+      console.log(path);
+      break;
+    }
 
-    var astarNeighbors = current.astarNeighbors;
+    removeFromArray(openSet, astarCurrent);
+    closedSet.push(astarCurrent);
 
-    for (var i = 0; i < astarNeighbors.lengthl i++) {
-      var neighbor = astarNeighbors[i];
-      // line 146 of atar script.js
+    var astarNeighbors = astarCurrent.astarNeighbors;
+    for (var k = 0; k < astarNeighbors.length; k++) {
+      var neighbor = astarNeighbors[k];
+      console.log(neighbor.i-1);
+
+      // if astarGrid[i] or astarGrid[j] = -1 error is thrown
+      // write function to validate this
+      if(!closedSet.includes(neighbor)) {
+        if(
+            neighbor === astarGrid[neighbor.i][neighbor.j-1] && neighbor.wall[0] != true ||
+            neighbor === astarGrid[neighbor.i+1][neighbor.j] && neighbor.wall[1] != true ||
+            neighbor === astarGrid[neighbor.i][neighbor.j+1] && neighbor.wall[2] != true ||
+            neighbor === astarGrid[neighbor.i-1][neighbor.j] && neighbor.wall[3] != true
+          ) {
+          // can go that way
+          var tempG = astarCurrent.g + 1;
+
+          var newPath = false;
+          if(openSet.includes(neighbor)) {
+            if(tempG < neighbor.g) {
+              neighbor.g = tempG;
+              newPath = true;
+            }
+          }else{
+            neighbor.g = tempG;
+            newPath = true;
+            openSet.push(neighbor);
+          }
+
+          if(newPath) {
+            neighbor.h = heuristic(neighbor,end);
+            neighbor.f = neighbor.g + neighbor.h;
+            neighbor.previous = current;
+          }
+          // end of block
+        }
+
+      }
     }
 
   }
+  if(openSet.length < 0){
+    //no solution
+    console.log('no solution');
+    console.log(path);
+    return;
+  }
 
-}
+} //end of astar
 
 function Cell(i, j) {
 
