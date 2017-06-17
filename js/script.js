@@ -109,14 +109,14 @@ function astar(astarGrid) {
 
   var winner = 0;
   while (openSet.length >= 0) {
-    console.log('checking');
+    console.log('looped');
         for (var i = 0; i < openSet.length; i++) {
           if(openSet[i].f < openSet[winner].f) {
         winner = i;
       }
     }
     var astarCurrent = openSet[winner];
-
+    console.log(astarCurrent);
 
     // var temp = astarCurrent;
     // path.push(temp)
@@ -134,25 +134,22 @@ function astar(astarGrid) {
       console.log(path);
       break;
     }
-
+    console.log(astarCurrent);
     removeFromArray(openSet, astarCurrent);
     closedSet.push(astarCurrent);
 
     var astarNeighbors = astarCurrent.astarNeighbors;
     for (var k = 0; k < astarNeighbors.length; k++) {
       var neighbor = astarNeighbors[k];
-      console.log(neighbor.i-1);
 
-      // if astarGrid[i] or astarGrid[j] = -1 error is thrown
-      // write function to validate this
       if(!closedSet.includes(neighbor)) {
         if(
-            neighbor === astarGrid[neighbor.i][neighbor.j-1] && neighbor.wall[0] != true ||
-            neighbor === astarGrid[neighbor.i+1][neighbor.j] && neighbor.wall[1] != true ||
-            neighbor === astarGrid[neighbor.i][neighbor.j+1] && neighbor.wall[2] != true ||
-            neighbor === astarGrid[neighbor.i-1][neighbor.j] && neighbor.wall[3] != true
+            val(neighbor.j-1) && neighbor === astarGrid[neighbor.i][neighbor.j-1] && neighbor.wall[0] != true ||
+            val(neighbor.i+1) && neighbor === astarGrid[neighbor.i+1][neighbor.j] && neighbor.wall[1] != true ||
+            val(neighbor.j+1) && neighbor === astarGrid[neighbor.i][neighbor.j+1] && neighbor.wall[2] != true ||
+            val(neighbor.i-1) && neighbor === astarGrid[neighbor.i-1][neighbor.j] && neighbor.wall[3] != true
           ) {
-          // can go that way
+          console.log('can go that way');
           var tempG = astarCurrent.g + 1;
 
           var newPath = false;
@@ -325,4 +322,19 @@ function heuristic(a,b) {
   // var d = abs(a.i - b.) + abs(a.j, b.j);
 
   return d;
+}
+
+/**
+ * Validation function to make sure the Cell
+ * being checked actually exists
+*/
+function val(i) {
+  var val;
+  if(i === -1 || i === cols+1 || i === rows+1) {
+    val = false;
+  }
+  else {
+    val = true;
+  }
+  return val;
 }
