@@ -25,7 +25,7 @@
  * Maze Gen Vars
 */
 var cols, rows;
-var w = 40;
+var w = 20;
 var grid;
 var current;
 var stack = [];
@@ -99,7 +99,7 @@ function draw() {
 function astar(astarGrid) {
   start = astarGrid[0][0];
   end = astarGrid[cols - 1][rows - 1];
-
+  // end = astarGrid[floor(cols / 2)] [floor(rows / 2)];
   openSet.push(start);
   for (var i = 0; i < cols; i++) {
     for (var j = 0; j < rows; j++) {
@@ -110,7 +110,7 @@ function astar(astarGrid) {
   var winner = 0;
   while (openSet.length >= 0) {
     console.log('looped');
-        for (var i = 0; i < openSet.length; i++) {
+    for (var i = 0; i < openSet.length; i++) {
           if(openSet[i].f < openSet[winner].f) {
         winner = i;
       }
@@ -118,15 +118,16 @@ function astar(astarGrid) {
     var astarCurrent = openSet[winner];
     console.log(astarCurrent);
 
-    // var temp = astarCurrent;
-    // path.push(temp)
-    // while(temp.previous) {
-    //   path.push(temp.previous);
-    //   temp = temp.previous;
-    // }
+    var temp = astarCurrent;
+    path.push(temp)
+    while(temp.previous) {
+      path.push(temp.previous);
+      temp = temp.previous;
+    }
 
     for(var i = 0; i < path.length; i++) {
       path[i].show(color(255,0,0));
+
     }
 
     if(astarCurrent == end) {
@@ -134,21 +135,47 @@ function astar(astarGrid) {
       console.log(path);
       break;
     }
-    console.log(astarCurrent);
     removeFromArray(openSet, astarCurrent);
     closedSet.push(astarCurrent);
 
     var astarNeighbors = astarCurrent.astarNeighbors;
     for (var k = 0; k < astarNeighbors.length; k++) {
       var neighbor = astarNeighbors[k];
-
       if(!closedSet.includes(neighbor)) {
-        if(
-            val(neighbor.j-1) && neighbor === astarGrid[neighbor.i][neighbor.j-1] && neighbor.wall[0] != true ||
-            val(neighbor.i+1) && neighbor === astarGrid[neighbor.i+1][neighbor.j] && neighbor.wall[1] != true ||
-            val(neighbor.j+1) && neighbor === astarGrid[neighbor.i][neighbor.j+1] && neighbor.wall[2] != true ||
-            val(neighbor.i-1) && neighbor === astarGrid[neighbor.i-1][neighbor.j] && neighbor.wall[3] != true
-          ) {
+        if(val(astarCurrent.j-1) === true) {
+          if(neighbor.j == astarCurrent.j-1 && neighbor.i == astarCurrent.i && neighbor.walls[2] != true) {
+            console.log("going up");
+            cont();
+          } else {console.log('error ' + neighbor.j + ' ' + neighbor.i + 'up')}
+        }
+
+        if(val(astarCurrent.i+1) === true) {
+          if(neighbor.i == astarCurrent.i+1 && neighbor.j == astarCurrent.j && neighbor.walls[3] != true) {
+            console.log("going right");
+            cont();
+          } else {console.log('error ' + neighbor.j + ' ' + neighbor.i + 'right')}
+        }
+
+        if(val(astarCurrent.j+1) === true) {
+          if(neighbor.j == astarCurrent.j+1 && neighbor.i == astarCurrent.i && neighbor.walls[0] != true) {
+            console.log("going down");
+            cont();
+          } else {console.log('error ' + neighbor.j + ' ' + neighbor.i + 'down')}
+        }
+
+        if(val(astarCurrent.i-1) === true) {
+          if(neighbor.i == astarCurrent.i-1 && neighbor.j == astarCurrent.j && neighbor.walls[1] != true) {
+            console.log("going left");
+            cont();
+          } else {console.log('error ' + neighbor.j + ' ' + neighbor.i + 'left')}
+        }
+
+
+
+
+
+        function cont() {
+          // start of if
           console.log('can go that way');
           var tempG = astarCurrent.g + 1;
 
@@ -170,7 +197,7 @@ function astar(astarGrid) {
             neighbor.previous = current;
           }
           // end of block
-        }
+        } // end of cont function
 
       }
     }
@@ -316,10 +343,10 @@ function removeFromArray(arr, elt) {
 
 function heuristic(a,b) {
   // Euchlidean distance
-  var d = dist(a.i, a.j, b.i, b.j);
+  // var d = dist(a.i, a.j, b.i, b.j);
 
   // Taxicab distance
-  // var d = abs(a.i - b.) + abs(a.j, b.j);
+  var d = abs(a.i - b.i) + abs(a.j - b.j);
 
   return d;
 }
@@ -328,13 +355,14 @@ function heuristic(a,b) {
  * Validation function to make sure the Cell
  * being checked actually exists
 */
-function val(i) {
+function val(v) {
   var val;
-  if(i === -1 || i === cols+1 || i === rows+1) {
+  if(v == -1 || v == cols+1 || v == rows+1) {
     val = false;
   }
   else {
     val = true;
   }
+  console.log(val);
   return val;
 }
